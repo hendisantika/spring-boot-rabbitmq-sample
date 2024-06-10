@@ -20,6 +20,8 @@ email sending should not block the response to the client.
 
 The picture below shows the system architecture.
 
+![system architecture](img/architecture.png "system architecture")
+
 ### Things todo list
 
 1. Clone this repository: `git clone https://github.com/hendisantika/spring-boot-rabbitmq-sample.git`
@@ -29,6 +31,8 @@ The picture below shows the system architecture.
 5. Run the application on each service: `mvn clean spring-boot:run`
 
 ### Send Queue
+
+![RabbitMQ](img/rabbitMQ.png "RabbitMQ")
 
 ```shell
 POST http://localhost:8080/register
