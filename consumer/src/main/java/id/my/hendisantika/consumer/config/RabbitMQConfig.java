@@ -1,5 +1,6 @@
 package id.my.hendisantika.consumer.config;
 
+import id.my.hendisantika.consumer.listener.UserRegisteredListener;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;

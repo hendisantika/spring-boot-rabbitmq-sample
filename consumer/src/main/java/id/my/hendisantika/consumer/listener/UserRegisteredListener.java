@@ -3,6 +3,7 @@ package id.my.hendisantika.consumer.listener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import id.my.hendisantika.consumer.dto.UserRegisteredPayload;
 import org.springframework.stereotype.Component;
 
 /**
