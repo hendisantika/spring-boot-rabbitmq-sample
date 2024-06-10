@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import id.my.hendisantika.producer.dto.RegisterUserDto;
 import id.my.hendisantika.producer.dto.UserRegisteredPayload;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ import java.util.Random;
  * Time: 06:54
  * To change this template use File | Settings | File Templates.
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -52,6 +54,7 @@ public class UserController {
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "User registered successfully!");
+        log.info("User registered successfully!");
 
         return ResponseEntity.ok(response);
     }
