@@ -1,4 +1,12 @@
 # spring-boot-rabbitmq-sample
+
+[![Java CI with Maven](https://github.com/hendisantika/spring-boot-rabbitmq-sample/actions/workflows/maven.yml/badge.svg)](https://github.com/hendisantika/spring-boot-rabbitmq-sample/actions/workflows/maven.yml)
+![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.x-6DB33F?logo=springboot)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-AMQP-FF6600?logo=rabbitmq)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-025E8C?logo=dependabot)](.github/dependabot.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Spring Boot RabbitMQ Sample
 
 Send and receive messages from a Spring boot applications using RabbitMQ.
@@ -22,13 +30,80 @@ The picture below shows the system architecture.
 
 ![system architecture](img/architecture.png "system architecture")
 
+### Tech stack
+
+| Component         | Version / Detail                                               |
+|-------------------|----------------------------------------------------------------|
+| Java              | **JDK 25** (Temurin in CI)                                     |
+| Spring Boot       | 4.1.x (`spring-boot-starter-amqp`, `spring-boot-starter-web`)  |
+| JSON              | Jackson 3 (`tools.jackson.databind.json.JsonMapper`)           |
+| Messaging         | RabbitMQ (AMQP 0-9-1)                                          |
+| Build             | Maven (wrapper included in each module)                        |
+| Boilerplate       | Lombok                                                         |
+
+### Project structure
+
+```text
+spring-boot-rabbitmq-sample
+├── producer   # REST API (port 8080) that publishes `UserRegisteredPayload` to the `user-registration` queue
+├── consumer   # Listens to the `user-registration` queue and prints the received payload
+├── img        # Screenshots used in this README
+└── .github
+    ├── workflows/maven.yml   # CI: builds & tests producer and consumer on JDK 25
+    └── dependabot.yml        # Automated dependency updates
+```
+
+### Prerequisites
+
+- JDK 25 (e.g. `sdk install java 25-tem`)
+- A running RabbitMQ broker. To run one locally with Docker:
+
+  ```shell
+  docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:management
+  ```
+
+  Then create the `user-registration` queue from the management UI at http://localhost:15672 (`guest` / `guest`).
+
 ### Things todo list
 
 1. Clone this repository: `git clone https://github.com/hendisantika/spring-boot-rabbitmq-sample.git`
 2. Navigate to directory: `cd spring-boot-rabbitmq-sample`
 3. Navigate to producer service: `cd producer`
-4. Open new terminal then navigate to consumer service: 'cd consumer'
-5. Run the application on each service: `mvn clean spring-boot:run`
+4. Open new terminal then navigate to consumer service: `cd consumer`
+5. Run the application on each service: `./mvnw clean spring-boot:run`
+
+The broker connection is configured in each module's `src/main/resources/application.properties`. You can override it
+with environment variables, e.g. to use a local broker:
+
+```shell
+SPRING_RABBITMQ_HOST=localhost SPRING_RABBITMQ_USERNAME=guest SPRING_RABBITMQ_PASSWORD=guest ./mvnw spring-boot:run
+```
+
+### Build & test
+
+```shell
+cd producer && ./mvnw clean verify
+cd consumer && ./mvnw clean verify
+```
+
+The tests start the Spring context with `spring.rabbitmq.listener.simple.auto-startup=false`, so they **do not need a
+running RabbitMQ broker**.
+
+### Continuous Integration
+
+[GitHub Actions](.github/workflows/maven.yml) builds and tests both modules in parallel (matrix: `producer`,
+`consumer`) on **JDK 25** for every push and pull request to `main`. On pushes to `main` it also submits the Maven
+dependency graph to GitHub so Dependabot alerts are accurate.
+
+### Dependabot
+
+[Dependabot](.github/dependabot.yml) keeps dependencies up to date:
+
+- **Maven** (`/producer` and `/consumer`) — checked daily at 05:00 (Asia/Jakarta). Updates are grouped into
+  `spring-boot`, `spring`, `maven-plugins` and `minor-and-patch` to reduce PR noise.
+- **GitHub Actions** — checked weekly (Monday 05:00 Asia/Jakarta), grouped into a single PR.
+- PRs are labelled (`dependencies`, `java`, `producer`/`consumer`, `github_actions`), assigned to the maintainer and
+  use conventional commit prefixes (`chore(deps)`, `ci(deps)`).
 
 ### Send Queue
 
@@ -49,7 +124,6 @@ Content-Type: application/json
 #### Producer Log
 
 ```shell
-/Users/hendisantika/.sdkman/candidates/java/21-amzn/bin/java -XX:TieredStopAtLevel=1 -Dspring.output.ansi.enabled=always -Dcom.sun.management.jmxremote -Dspring.jmx.enabled=true -Dspring.liveBeansView.mbeanDomain -Dspring.application.admin.enabled=true -Dmanagement.endpoints.jmx.exposure.include=* -javaagent:/Users/hendisantika/Applications/IntelliJ IDEA Ultimate.app/Contents/lib/idea_rt.jar=49954:/Users/hendisantika/Applications/IntelliJ IDEA Ultimate.app/Contents/bin -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath /Users/hendisantika/IdeaProjects/spring-boot-rabbitmq-sample/producer/target/classes:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter-amqp/3.3.0/spring-boot-starter-amqp-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter/3.3.0/spring-boot-starter-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot/3.3.0/spring-boot-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.3.0/spring-boot-autoconfigure-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.3.0/spring-boot-starter-logging-3.3.0.jar:/Users/hendisantika/.m2/repository/ch/qos/logback/logback-classic/1.5.6/logback-classic-1.5.6.jar:/Users/hendisantika/.m2/repository/ch/qos/logback/logback-core/1.5.6/logback-core-1.5.6.jar:/Users/hendisantika/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.23.1/log4j-to-slf4j-2.23.1.jar:/Users/hendisantika/.m2/repository/org/apache/logging/log4j/log4j-api/2.23.1/log4j-api-2.23.1.jar:/Users/hendisantika/.m2/repository/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13.jar:/Users/hendisantika/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/Users/hendisantika/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-messaging/6.1.8/spring-messaging-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-beans/6.1.8/spring-beans-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/amqp/spring-rabbit/3.1.5/spring-rabbit-3.1.5.jar:/Users/hendisantika/.m2/repository/org/springframework/amqp/spring-amqp/3.1.5/spring-amqp-3.1.5.jar:/Users/hendisantika/.m2/repository/org/springframework/retry/spring-retry/2.0.6/spring-retry-2.0.6.jar:/Users/hendisantika/.m2/repository/com/rabbitmq/amqp-client/5.21.0/amqp-client-5.21.0.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-context/6.1.8/spring-context-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-tx/6.1.8/spring-tx-6.1.8.jar:/Users/hendisantika/.m2/repository/io/micrometer/micrometer-observation/1.13.0/micrometer-observation-1.13.0.jar:/Users/hendisantika/.m2/repository/io/micrometer/micrometer-commons/1.13.0/micrometer-commons-1.13.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.3.0/spring-boot-starter-web-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.3.0/spring-boot-starter-json-3.3.0.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.17.1/jackson-databind-2.17.1.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.17.1/jackson-annotations-2.17.1.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.17.1/jackson-core-2.17.1.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.17.1/jackson-datatype-jdk8-2.17.1.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.17.1/jackson-datatype-jsr310-2.17.1.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.17.1/jackson-module-parameter-names-2.17.1.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.3.0/spring-boot-starter-tomcat-3.3.0.jar:/Users/hendisantika/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.24/tomcat-embed-core-10.1.24.jar:/Users/hendisantika/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.24/tomcat-embed-el-10.1.24.jar:/Users/hendisantika/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.24/tomcat-embed-websocket-10.1.24.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-web/6.1.8/spring-web-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-webmvc/6.1.8/spring-webmvc-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-aop/6.1.8/spring-aop-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-expression/6.1.8/spring-expression-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.0/spring-boot-configuration-processor-3.3.0.jar:/Users/hendisantika/.m2/repository/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar:/Users/hendisantika/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-core/6.1.8/spring-core-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-jcl/6.1.8/spring-jcl-6.1.8.jar id.my.hendisantika.producer.ProducerApplication
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
 ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
@@ -82,7 +156,6 @@ Content-Type: application/json
 Consumer Log
 
 ```shell
-/Users/hendisantika/.sdkman/candidates/java/21-amzn/bin/java -XX:TieredStopAtLevel=1 -Dspring.output.ansi.enabled=always -Dcom.sun.management.jmxremote -Dspring.jmx.enabled=true -Dspring.liveBeansView.mbeanDomain -Dspring.application.admin.enabled=true -Dmanagement.endpoints.jmx.exposure.include=* -javaagent:/Users/hendisantika/Applications/IntelliJ IDEA Ultimate.app/Contents/lib/idea_rt.jar=50550:/Users/hendisantika/Applications/IntelliJ IDEA Ultimate.app/Contents/bin -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath /Users/hendisantika/IdeaProjects/spring-boot-rabbitmq-sample/consumer/target/classes:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter-amqp/3.3.0/spring-boot-starter-amqp-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter/3.3.0/spring-boot-starter-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.3.0/spring-boot-starter-logging-3.3.0.jar:/Users/hendisantika/.m2/repository/ch/qos/logback/logback-classic/1.5.6/logback-classic-1.5.6.jar:/Users/hendisantika/.m2/repository/ch/qos/logback/logback-core/1.5.6/logback-core-1.5.6.jar:/Users/hendisantika/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.23.1/log4j-to-slf4j-2.23.1.jar:/Users/hendisantika/.m2/repository/org/apache/logging/log4j/log4j-api/2.23.1/log4j-api-2.23.1.jar:/Users/hendisantika/.m2/repository/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13.jar:/Users/hendisantika/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/Users/hendisantika/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-messaging/6.1.8/spring-messaging-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-beans/6.1.8/spring-beans-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/amqp/spring-rabbit/3.1.5/spring-rabbit-3.1.5.jar:/Users/hendisantika/.m2/repository/org/springframework/amqp/spring-amqp/3.1.5/spring-amqp-3.1.5.jar:/Users/hendisantika/.m2/repository/org/springframework/retry/spring-retry/2.0.6/spring-retry-2.0.6.jar:/Users/hendisantika/.m2/repository/com/rabbitmq/amqp-client/5.21.0/amqp-client-5.21.0.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-context/6.1.8/spring-context-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-aop/6.1.8/spring-aop-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-expression/6.1.8/spring-expression-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-tx/6.1.8/spring-tx-6.1.8.jar:/Users/hendisantika/.m2/repository/io/micrometer/micrometer-observation/1.13.0/micrometer-observation-1.13.0.jar:/Users/hendisantika/.m2/repository/io/micrometer/micrometer-commons/1.13.0/micrometer-commons-1.13.0.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.17.1/jackson-databind-2.17.1.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.17.1/jackson-annotations-2.17.1.jar:/Users/hendisantika/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.17.1/jackson-core-2.17.1.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-devtools/3.3.0/spring-boot-devtools-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot/3.3.0/spring-boot-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.3.0/spring-boot-autoconfigure-3.3.0.jar:/Users/hendisantika/.m2/repository/org/springframework/boot/spring-boot-configuration-processor/3.3.0/spring-boot-configuration-processor-3.3.0.jar:/Users/hendisantika/.m2/repository/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar:/Users/hendisantika/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-core/6.1.8/spring-core-6.1.8.jar:/Users/hendisantika/.m2/repository/org/springframework/spring-jcl/6.1.8/spring-jcl-6.1.8.jar id.my.hendisantika.consumer.ConsumerApplication
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
 ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
