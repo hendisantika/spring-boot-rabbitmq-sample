@@ -92,7 +92,7 @@ updates:
       - hendisantika
     labels:
       - dependencies
-      - github-actions
+      - github_actions
     commit-message:
       prefix: "ci(deps)"
       include: scope
