@@ -1,10 +1,9 @@
 package id.my.hendisantika.consumer.listener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import id.my.hendisantika.consumer.dto.UserRegisteredPayload;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,13 +16,13 @@ import org.springframework.stereotype.Component;
  * To change this template use File | Settings | File Templates.
  */
 @Component
+@RequiredArgsConstructor
 public class UserRegisteredListener {
-    public void onMessageReceived(String message) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
 
-        TypeReference<UserRegisteredPayload> mapType = new TypeReference<>() {
-        };
-        UserRegisteredPayload payload = objectMapper.readValue(message, mapType);
+    private final JsonMapper jsonMapper;
+
+    public void onMessageReceived(String message) {
+        UserRegisteredPayload payload = jsonMapper.readValue(message, UserRegisteredPayload.class);
 
         System.out.println("Message received");
         System.out.println("User full name:    " + payload.fullName());
