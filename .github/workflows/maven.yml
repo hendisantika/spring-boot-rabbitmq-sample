@@ -48,5 +48,6 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: advanced-security/maven-dependency-submission-action@v6.0.1
         with:
-          directory: ${{ matrix.module }}
+          directory: ${{ github.workspace }}/${{ matrix.module }}
+          ignore-maven-wrapper: true
           correlator: ${{ github.job }}-${{ matrix.module }}
